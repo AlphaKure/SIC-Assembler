@@ -89,7 +89,12 @@ def main(path):
     objectFunC=list()
     asmFile=open(path,'r',encoding='utf-8')
     asmData=asmFile.readlines()
-    asm=[data.strip().split() for data in asmData]
+    asm=list()
+    for data in asmData:
+        if len(data.strip().split())!=3:
+            if data.strip().split()[0]!='.':
+                data='-'+data
+        asm.append(data.strip().split())
     for chunk in asm: 
         if chunk[0]!='.':    
             if chunk[1]=='START':
@@ -145,4 +150,4 @@ def main(path):
 
     
 if __name__=='__main__':
-    main('./main.txt')
+    main('./test.txt')
