@@ -145,4 +145,4 @@ def main(path):
 
     
 if __name__=='__main__':
-    main('./a.txt')
+    main('./main.txt')
