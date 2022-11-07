@@ -1,16 +1,16 @@
 def transHex(inputHex:str=None,dec:int=None,bits=4)->str:
     if inputHex!=None:
-        while len(inputHex)<bits:
-            inputHex='0'+inputHex
-        return inputHex.upper()
+        if dec!=None:
+            return transHex(dec=(int(inputHex,16)+dec),bits=bits)
+        else:
+            while len(inputHex)<bits:
+                inputHex='0'+inputHex
+            return inputHex.upper()
     if dec!=None:
         temp=hex(dec)[2:]
         while len(temp)<bits:
             temp='0'+temp
         return temp.upper()
-
-def hexAdder(hex:str,addDec:int,bits=4)->str:
-    return transHex(dec=int(hex,base=16)+addDec,bits=bits)
 
 def commandLocCal(chunk:list[str])->int:
     if chunk[1]=='RESW':
@@ -39,7 +39,7 @@ def opcodeGen(chunk:list[str],symbolTable):
                     return opTable[chunk[1]]+symbolTable[chunk[2]] 
                 else:
                     temp=transHex(inputHex=opTable[chunk[1]]+symbolTable[chunk[2].split(',')[0]],bits=6)
-                    temp=hexAdder(hex=temp,addDec=32768,bits=6)
+                    temp=transHex(inputHex=temp,dec=32768,bits=6)
                     return temp
             else:
                 if chunk[1]=='WORD':
@@ -82,12 +82,17 @@ def createObjectProgram(objectProgramFile,programName,startLocation,objectFunc:l
     objectProgramFile.write(f'E{startLocation}\n')
     objectProgramFile.close()
 
-def main(path):
+def main(inputFile):
+
+    locationFile=open('./loc.txt','w',encoding='utf-8')
+    outputFile=open('./output.txt','w',encoding='utf-8')
+    objectcodeFile=open('./objectcode.txt','w',encoding='utf-8')
+
     locationList=list()
     programName=""
     symbolTable=dict()
     objectFunC=list()
-    asmFile=open(path,'r',encoding='utf-8')
+    asmFile=open(inputFile,'r',encoding='utf-8')
     asmData=asmFile.readlines()
     asm=list()
     for data in asmData:
@@ -104,14 +109,9 @@ def main(path):
                 locationList.append(nowLocation)
             else:
                 locationList.append(nowLocation)
-                nowLocation=hexAdder(hex=nowLocation,addDec=commandLocCal(chunk))
+                nowLocation=transHex(inputHex=nowLocation,dec=commandLocCal(chunk))
         else:
             locationList.append(nowLocation)
-    
-            
-    locationFile=open('./loc.txt','w',encoding='utf-8')
-    outputFile=open('./output.txt','w',encoding='utf-8')
-    objectcodeFile=open('./objectcode.txt','w',encoding='utf-8')
 
     #輸出loc.txt
     iter=0
@@ -145,9 +145,7 @@ def main(path):
     createObjectProgram(objectcodeFile,programName,startLocation,objectFunC,locationList)
 
     #print(objectFunC)
-                
-            
 
-    
+
 if __name__=='__main__':
     main('./test.txt')
