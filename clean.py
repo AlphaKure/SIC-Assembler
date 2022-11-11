@@ -87,7 +87,7 @@ class assembler:
             if self.machineCode[iter]!='' and self.machineCode[iter]!=None:
                 if iter!=len(self.locationList)-1: 
                     temp=temp+self.machineCode[iter] 
-            if len(temp)>55 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
+            if len(temp)>54 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
                 self.objectcodeFile.write(f'T{firstLocation}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
                 temp='' 
                 jumpFlag=False  

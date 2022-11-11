@@ -155,8 +155,8 @@ class assembler:
             if self.machineCode[iter]!='' and self.machineCode[iter]!=None:
                 if iter!=len(self.locationList)-1: # 不是最後一筆且objectCode不是空或空字串(即指令不是註解或START END RESW RESB)
                     temp=temp+self.machineCode[iter] # 把機器碼push進暫存
-            if len(temp)>55 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
-                # 如果暫存長度>55 或 iter指到最後一筆且暫存不為空 或 指令位址距離>4 
+            if len(temp)>54 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
+                # 如果暫存長度>54 或 iter指到最後一筆且暫存不為空 或 指令位址距離>4 
                 # 輸出並換行
                 self.objectcodeFile.write(f'T{firstLocation}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
                 temp='' # 暫存清零
