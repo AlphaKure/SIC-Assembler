@@ -143,28 +143,25 @@ class assembler:
         while len(self.programName)<6: # 擴充程式名稱
             self.programName=self.programName+' '
         self.objectcodeFile.write(f'H{self.programName}{self.startLocation}{self.calHex(intDec=int(self.locationList[-1],16)-int(self.startLocation,16),bits=6)}\n')
-        temp=''
         iter=0
-        jumpFlag=False
-        firstLocation=self.calHex(strHex=self.startLocation,bits=6)
-        for location in self.locationList: 
-            if iter!=len(self.locationList)-1:
-                if (int(self.locationList[iter+1],16)-int(location,16))>4:
-                    # 下一指令位址距離>4 
-                    jumpFlag=True
-            if self.machineCode[iter]!='' and self.machineCode[iter]!=None:
-                if iter!=len(self.locationList)-1: # 不是最後一筆且objectCode不是空或空字串(即指令不是註解或START END RESW RESB)
-                    temp=temp+self.machineCode[iter] # 把機器碼push進暫存
-            if len(temp)>54 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
-                # 如果暫存長度>54 或 iter指到最後一筆且暫存不為空 或 指令位址距離>4 
-                # 輸出並換行
-                self.objectcodeFile.write(f'T{firstLocation}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
-                temp='' # 暫存清零
-                jumpFlag=False  
-                if iter!=len(self.locationList)-1:
-                    firstLocation=self.calHex(strHex=self.locationList[iter+1],bits=6) # 更新開始位置
+        temp=''
+        loc=self.startLocation
+        for code in self.machineCode:
+            if code==None:
+                pass # 註解行跳過
+            elif code=='': # 因RESW RESB START END 而造成的跳行 
+                if temp!='': # 避免因 START END 或連續RES temp為空輸出
+                    self.objectcodeFile.write(f'T{loc}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
+                    temp=''
+                if iter!=len(self.machineCode)-1: #避免超出範圍報錯
+                    loc=self.calHex(strHex=self.locationList[iter+1],bits=6)
+            else:
+                if len(temp+code)>60: #檢查接下來加入項會不會超過 超過範圍
+                    self.objectcodeFile.write(f'T{loc}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
+                    temp=''
+                    loc=self.calHex(strHex=self.locationList[iter],bits=6)
+                temp=temp+code 
             iter+=1
-
         self.objectcodeFile.write(f'E{self.startLocation}\n')
         self.objectcodeFile.close()
 

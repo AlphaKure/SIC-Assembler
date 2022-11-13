@@ -76,25 +76,25 @@ class assembler:
         while len(self.programName)<6:
             self.programName=self.programName+' '
         self.objectcodeFile.write(f'H{self.programName}{self.startLocation}{self.calHex(intDec=int(self.locationList[-1],16)-int(self.startLocation,16),bits=6)}\n')
-        temp=''
         iter=0
-        jumpFlag=False
-        firstLocation=self.calHex(strHex=self.startLocation,bits=6)
-        for location in self.locationList: 
-            if iter!=len(self.locationList)-1:
-                if (int(self.locationList[iter+1],16)-int(location,16))>4:
-                    jumpFlag=True
-            if self.machineCode[iter]!='' and self.machineCode[iter]!=None:
-                if iter!=len(self.locationList)-1: 
-                    temp=temp+self.machineCode[iter] 
-            if len(temp)>54 or (iter==len(self.locationList)-1 and temp!='')or jumpFlag:
-                self.objectcodeFile.write(f'T{firstLocation}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
-                temp='' 
-                jumpFlag=False  
-                if iter!=len(self.locationList)-1:
-                    firstLocation=self.calHex(strHex=self.locationList[iter+1],bits=6) 
+        temp=''
+        loc=self.startLocation
+        for code in self.machineCode:
+            if code==None:
+                pass
+            elif code=='':
+                if temp!='':
+                    self.objectcodeFile.write(f'T{loc}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
+                    temp=''
+                if iter!=len(self.machineCode)-1:
+                    loc=self.calHex(strHex=self.locationList[iter+1],bits=6)
+            else:
+                if len(temp+code)>60:
+                    self.objectcodeFile.write(f'T{loc}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
+                    temp=''
+                    loc=self.calHex(strHex=self.locationList[iter],bits=6)
+                temp=temp+code
             iter+=1
-
         self.objectcodeFile.write(f'E{self.startLocation}\n')
         self.objectcodeFile.close()
 
