@@ -172,7 +172,7 @@ class assembler:
         asmData=self.inputFile.readlines()
         asm=list() # 每行指令分割list
         for data in asmData:
-            if len(data.strip().split())!=3: #有三種可能 1.註解行 2.沒有symbol的指令 3.沒有TA的指令(不太影響啦)
+            if len(data.strip().split())<3: #有三種可能 1.註解行 2.沒有symbol的指令 3.沒有TA的指令(不太影響啦)
                 # 把沒有設定symbol的指令加上'-' 使所有指令分割list長度都為3
                 if data.strip().split()[0]!='.':
                     data='-'+data

@@ -103,7 +103,7 @@ class assembler:
         asmData=self.inputFile.readlines()
         asm=list() 
         for data in asmData:
-            if len(data.strip().split())!=3: 
+            if len(data.strip().split())<3: 
                 if data.strip().split()[0]!='.':
                     data='-'+data
             asm.append(data.strip().split())
@@ -139,5 +139,5 @@ class assembler:
         self.createObjectProgram()
 
 if __name__=='__main__':
-    a=assembler('./test.txt')
+    a=assembler('./input.txt')
     a.process()
