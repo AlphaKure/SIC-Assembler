@@ -156,7 +156,7 @@ class assembler:
                 if iter!=len(self.machineCode)-1: #避免超出範圍報錯
                     loc=self.calHex(strHex=self.locationList[iter+1],bits=6)
             else:
-                if len(temp+code)>60: #檢查接下來加入項會不會超過 超過範圍
+                if len(temp+code)>60: #檢查接下來加入項會不會超過範圍
                     self.objectcodeFile.write(f'T{loc}{self.calHex(intDec=len(temp)//2,bits=2)}{temp}\n')
                     temp=''
                     loc=self.calHex(strHex=self.locationList[iter],bits=6)
@@ -177,7 +177,7 @@ class assembler:
                 if data.strip().split()[0]!='.':
                     data='-'+data
             asm.append(data.strip().split())
-        for chunk in asm: 
+        for chunk in asm: # 計算指令位址
             if chunk[0]!='.':# 非註解    
                 if chunk[1]=='START':
                     # 第一行
@@ -188,37 +188,27 @@ class assembler:
                 else:
                     # 其他行
                     self.locationList.append(nowLocation)
+                    if chunk[0]!='-':
+                        self.symbolTable[chunk[0]]=nowLocation #找出所有symbol 將symbol位址存入symbolTable
                     nowLocation=self.calHex(strHex=nowLocation,intDec=self.memoryLocationCal(chunk))
             else:
                 self.locationList.append(nowLocation)
 
-        #輸出loc.txt
-        iter=0
-        for line in asmData:
-            self.locFile.writelines(f'{self.locationList[iter]} {line} ')
-            iter+=1
-        self.locFile.close()
-
-        #處理SymbolTable
-        iter=0 
-        for chunk in asm:
-            if chunk[0]!='.' and chunk[0]!='-' and iter!=0: 
-                self.symbolTable[chunk[0]]=self.locationList[iter] #找出所有symbol 將symbol位址存入symbolTable
-            iter+=1
-        
-        #生成機器碼
+        #生成機器碼 不能與上合併原因是symbol可能在下面
         for chunk in asm:
             self.machineCode.append(self.machineCodeGenerator(chunk))
 
-        #輸出output.txt
+        #輸出loc.txt和output.txt
         iter=0
         for line in asmData:
             if self.machineCode[iter]==None:
                 self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()} \n')
             else:
                 self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()}    {self.machineCode[iter]} \n')
+            self.locFile.writelines(f'{self.locationList[iter]} {line} ')
             iter+=1
         self.outputFile.close()
+        self.locFile.close()
         
         #輸出及生成objectcode.txt
         self.createObjectProgram()

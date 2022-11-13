@@ -116,22 +116,12 @@ class assembler:
                     self.locationList.append(nowLocation)
                 else:
                     self.locationList.append(nowLocation)
+                    if chunk[0]!='-':
+                        self.symbolTable[chunk[0]]=nowLocation
                     nowLocation=self.calHex(strHex=nowLocation,intDec=self.memoryLocationCal(chunk))
             else:
                 self.locationList.append(nowLocation)
 
-        iter=0
-        for line in asmData:
-            self.locFile.writelines(f'{self.locationList[iter]} {line} ')
-            iter+=1
-        self.locFile.close()
-
-        iter=0 
-        for chunk in asm:
-            if chunk[0]!='.' and chunk[0]!='-' and iter!=0: 
-                self.symbolTable[chunk[0]]=self.locationList[iter] 
-            iter+=1
-        
         for chunk in asm:
             self.machineCode.append(self.machineCodeGenerator(chunk))
 
@@ -141,9 +131,11 @@ class assembler:
                 self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()} \n')
             else:
                 self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()}    {self.machineCode[iter]} \n')
+            self.locFile.writelines(f'{self.locationList[iter]} {line} ')
             iter+=1
         self.outputFile.close()
-        
+        self.locFile.close()
+
         self.createObjectProgram()
 
 if __name__=='__main__':
