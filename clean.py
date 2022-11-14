@@ -127,11 +127,9 @@ class assembler:
 
         iter=0
         for line in asmData:
-            if self.machineCode[iter]==None:
-                self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()} \n')
-            else:
+            if self.machineCode[iter]!=None:
                 self.outputFile.writelines(f'{self.locationList[iter]} {line.rstrip()}    {self.machineCode[iter]} \n')
-            self.locFile.writelines(f'{self.locationList[iter]} {line} ')
+                self.locFile.writelines(f'{self.locationList[iter]} {line} ')
             iter+=1
         self.outputFile.close()
         self.locFile.close()
@@ -139,5 +137,9 @@ class assembler:
         self.createObjectProgram()
 
 if __name__=='__main__':
-    a=assembler('./input.txt')
+    a=assembler('./testdata/monday.txt'
+                ,outputFile='./output/output.txt'
+                ,locFile='./output/loc.txt'
+                ,objectcodeFile='./output/objectcode.txt'
+                )
     a.process()
